@@ -1,0 +1,40 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release ..
+    - name: build
+      run: cmake --build build
+    - name: test
+      run: ./bin/unit_tests --wait-for-keypress never -d yes
+  
+  macos:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: mkdir build && cd build && cmake ..
+    - name: build
+      run: cmake --build build
+    - name: test
+      run: ./bin/unit_tests --wait-for-keypress never -d yes exclude:large_files
+
+  windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: configure
+      run: mkdir build && cd build && cmake ..
+    - name: build
+      run: cmake --build build --config Debug
+    - name: test
+      run: ./bin/Debug/unit_tests --wait-for-keypress never -d yes exclude:large_files
